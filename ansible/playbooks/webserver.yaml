@@ -1,0 +1,60 @@
+---
+- name: playbook
+  hosts: all
+  become: yes
+  tasks:
+  - name: Update repositories
+    apt:
+      update_cache: yes
+  - name: hostname
+    hostname:
+      name: web_server 
+  - name: Install required system packages
+    apt:
+      pkg:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+        - python3-pip
+        - virtualenv
+        - python3-setuptools
+      state: latest
+      update_cache: true
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu focal stable
+      state: present
+  - name: Update apt and install docker-ce
+    apt:
+      name: docker-ce
+      state: latest
+      update_cache: true
+  - name: Start service docker 
+    service:
+      name: docker
+      state: started
+  - name: Enable service docker
+    service:
+      name: docker
+      enabled: yes
+  - name: Install Docker Module for Python (dodker library for python)
+    pip:
+      name: docker
+  - name: Log into private registry and force re-authorization
+    docker_login:
+      registry: https://index.docker.io/v1
+      username: eodgeorge
+      password: Wenger12345@
+  - name: create a myapp container
+    docker_container:
+      name: myapp
+      image: eodgeorge/myapp:latest
+      state: started
+      exposed_ports:
+        - 8080
+

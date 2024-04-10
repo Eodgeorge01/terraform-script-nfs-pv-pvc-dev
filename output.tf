@@ -27,6 +27,11 @@ output "ansible-ip" {
   value = aws_instance.ansible.public_ip
 }
 
+output "web-server" {
+  value = aws_instance.web-server.public_ip
+}
+
+
 # output "sonarqube-ip" {
 #   value = aws_instance.sonarqube.public_ip
 # }

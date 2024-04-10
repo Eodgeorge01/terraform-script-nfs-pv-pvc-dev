@@ -12,7 +12,7 @@ sudo chown -R ubuntu:ubuntu /etc/ansible/
 echo "${ansible-target-ip} ansible_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/keypair.pem" >> /etc/ansible/hosts
 sudo chown -R ubuntu:ubuntu /etc/ssh/
 sudo bash -c 'echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config'
-echo "${file("./ansible/playbooks/nginx-playbook.yaml")}" >> /home/ubuntu/nginx-playbook.yaml
+echo "${file("./ansible/playbooks/webserver.yaml")}" >> /home/ubuntu/webserver.yaml
 sudo hostnamectl set-hostname ansible-host
   
   

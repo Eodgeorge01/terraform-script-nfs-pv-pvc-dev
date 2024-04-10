@@ -190,13 +190,26 @@ resource "aws_instance" "ansible" {
   # user_data              = file("./ansible/ansible-user-data.sh")
   user_data              = templatefile("./ansible/ansible-user-data.sh", {
     prv-key = tls_private_key.keypair.private_key_pem
-    ansible-target-ip = aws_instance.jenkins-agent.public_ip
+    ansible-target-ip = aws_instance.web-server.public_ip
   })
 
   user_data_replace_on_change = true
 
   tags = {
     Name = "ansible"
+  }
+}
+
+# launch the instance for web-server
+resource "aws_instance" "web-server" {
+  ami                    = data.aws_ami.k8s-dev.id
+  instance_type          = "t2.micro"
+  subnet_id              = aws_default_subnet.az1.id
+  vpc_security_group_ids = [aws_security_group.k8s-sg.id]
+  key_name               = aws_key_pair.pub_key.key_name
+
+  tags = {
+    Name = "web-server"
   }
 }
 
