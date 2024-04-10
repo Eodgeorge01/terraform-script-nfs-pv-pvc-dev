@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gooseprawn-app
+spec:
+  replica: 2
+  selector:
+    matchLabels:
+      app: goose-prawn
+  template:
+    metadata:
+      labels:
+        app: goose-prawn
+    spec:
+      volumes:
+      - name: nfs-storage
+        persistentVolumeClaim:
+          claimName: nfs-pvc
+      containers:
+      - name: web-container
+        image: nginx
+        volumeMounts:
+        - mountPath: /tmp/data
+          name: nfs-storage  
+        - mountPath: /tmp/data_
+          name: nfs-storage
+        ports:
+        - containerPort: 80
+        resources:          #requesting scheduler, 
+          limits:           #to schedule application on a node with at least 100m
+            cpu: "200m"     # but not consume beyond 200m of that node
+          requests:
+            cpu: "100m"

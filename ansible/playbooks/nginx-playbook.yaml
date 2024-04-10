@@ -1,0 +1,13 @@
+---
+- name: playbook
+  hosts: all
+  become: yes
+  tasks:
+  - name: install nginx
+    yum:
+      name: nginx
+      state: latest
+  - name: start nginx apps
+    service:
+      name: nginx
+      state: started
