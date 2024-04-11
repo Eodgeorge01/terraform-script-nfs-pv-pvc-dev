@@ -150,74 +150,106 @@ data "aws_ami" "k8s-dev" {
 
 }
 
-# launch the instance for worker-node1
-resource "aws_instance" "jenkins-controller" {
-  ami                         = "ami-035cecbff25e0d91e"
-  instance_type               = "t2.medium"
-  subnet_id                   = aws_default_subnet.az1.id
-  vpc_security_group_ids      = [aws_security_group.k8s-sg.id]
-  key_name                    = aws_key_pair.pub_key.key_name
-  user_data                   = local.jenkins_user_data
-  user_data_replace_on_change = true
+# launch the instance for jenkins-controller
+# resource "aws_instance" "jenkins-controller" {
+#   ami                         = "ami-035cecbff25e0d91e"
+#   instance_type               = "t2.medium"
+#   subnet_id                   = aws_default_subnet.az1.id
+#   vpc_security_group_ids      = [aws_security_group.k8s-sg.id]
+#   key_name                    = aws_key_pair.pub_key.key_name
+#   # user_data                   = local.jenkins_user_data
+#     # user_data              = file("./jenkins-controller.sh")
+#   # user_data = templatefile("./jenkins-controller.sh", {
+#   #   jenkins-agent-ip           = aws_instance.jenkins-agent.public_ip
+#   #  })
+#   user_data_replace_on_change = true
+
+#   tags = {
+#     Name = "jenkins-controller"
+#   }
+# }
+
+# launch the instance for jenkins-controller-ubuntu
+resource "aws_instance" "jenkins-u-controller" {
+  ami                    = data.aws_ami.k8s-dev.id
+  instance_type          = "t2.medium"
+  subnet_id              = aws_default_subnet.az1.id
+  vpc_security_group_ids = [aws_security_group.k8s-sg.id]
+  key_name               = aws_key_pair.pub_key.key_name
+  #  user_data           = file("./jenkins-controller.sh")
 
   tags = {
-    Name = "jenkins-controller"
+    Name = "jenkins-u-controller"
   }
 }
 
-# launch the instance for worker-node1
-resource "aws_instance" "jenkins-agent" {
-  ami                         = "ami-035cecbff25e0d91e"
-  instance_type               = "t2.micro"
-  subnet_id                   = aws_default_subnet.az1.id
-  vpc_security_group_ids      = [aws_security_group.k8s-sg.id]
-  key_name                    = aws_key_pair.pub_key.key_name
-  user_data                   = local.jenkins_user_data2
-  user_data_replace_on_change = true
+# launch the instance for jenkins-agent
+# resource "aws_instance" "jenkins-agent" {
+#   ami                         = "ami-035cecbff25e0d91e"
+#   instance_type               = "t2.micro"
+#   subnet_id                   = aws_default_subnet.az1.id
+#   vpc_security_group_ids      = [aws_security_group.k8s-sg.id]
+#   key_name                    = aws_key_pair.pub_key.key_name
+#   user_data                   = local.jenkins_user_data2
+#   user_data_replace_on_change = true
 
-  tags = {
-    Name = "jenkins-agent"
-  }
-}
+#   tags = {
+#     Name = "jenkins-agent"
+#   }
+# }
 
-# launch the instance for ansible
-resource "aws_instance" "ansible" {
+# launch the instance for jenkins-agent-A
+resource "aws_instance" "jenkins-u-agent" {
   ami                    = data.aws_ami.k8s-dev.id
   instance_type          = "t2.micro"
   subnet_id              = aws_default_subnet.az1.id
   vpc_security_group_ids = [aws_security_group.k8s-sg.id]
   key_name               = aws_key_pair.pub_key.key_name
-  # user_data              = file("./ansible/ansible-user-data.sh")
-  user_data              = templatefile("./ansible/ansible-user-data.sh", {
-    prv-key = tls_private_key.keypair.private_key_pem
-    ansible-target-ip = aws_instance.web-server.public_ip
-  })
-
-  user_data_replace_on_change = true
+  user_data              = local.jenkins_user_data2
 
   tags = {
-    Name = "ansible"
+    Name = "jenkins-u-agent"
   }
 }
 
-# launch the instance for web-server
-resource "aws_instance" "web-server" {
-  ami                    = data.aws_ami.k8s-dev.id
-  instance_type          = "t2.micro"
-  subnet_id              = aws_default_subnet.az1.id
-  vpc_security_group_ids = [aws_security_group.k8s-sg.id]
-  key_name               = aws_key_pair.pub_key.key_name
+# # launch the instance for ansible
+# resource "aws_instance" "ansible" {
+#   ami                    = data.aws_ami.k8s-dev.id
+#   instance_type          = "t2.micro"
+#   subnet_id              = aws_default_subnet.az1.id
+#   vpc_security_group_ids = [aws_security_group.k8s-sg.id]
+#   key_name               = aws_key_pair.pub_key.key_name
+#   # user_data              = file("./ansible/ansible-user-data.sh")
+#   user_data = templatefile("./ansible/ansible-user-data.sh", {
+#     prv-key           = tls_private_key.keypair.private_key_pem
+#     ansible-target-ip = aws_instance.web-server.public_ip
+#   })
 
-  tags = {
-    Name = "web-server"
-  }
-}
+#   user_data_replace_on_change = true
+
+#   tags = {
+#     Name = "ansible"
+#   }
+# }
+
+# # launch the instance for web-server
+# resource "aws_instance" "web-server" {
+#   ami                    = data.aws_ami.k8s-dev.id
+#   instance_type          = "t2.micro"
+#   subnet_id              = aws_default_subnet.az1.id
+#   vpc_security_group_ids = [aws_security_group.k8s-sg.id]
+#   key_name               = aws_key_pair.pub_key.key_name
+
+#   tags = {
+#     Name = "web-server"
+#   }
+# }
 
 
 
-  # user_data = templatefile("./ansible/ansible-user-data.sh", {
-  #   keypair = tls_private_key.keypair.private_key_pem
-  # templatefile("./ansible/ansible-user-data.sh", {})
+# user_data = templatefile("./ansible/ansible-user-data.sh", {
+#   keypair = tls_private_key.keypair.private_key_pem
+# templatefile("./ansible/ansible-user-data.sh", {})
 
 # launch the instance for sonarqube
 # resource "aws_instance" "sonarqube" {

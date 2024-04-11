@@ -27,6 +27,7 @@ pipeline {
                 sh 'mvn -f pom.xml clean package'
             }
         }
+
         stage('Push Artifact to Nexus Repo') {
             steps {
                 nexusArtifactUploader artifacts: [[artifactId: 'spring-petclinic',
